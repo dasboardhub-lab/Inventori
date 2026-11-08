@@ -1,0 +1,1713 @@
+html
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Gudang</title>
+
+  <style>
+    :root {
+      --navy: #15243b;
+      --navy-soft: #213652;
+      --blue: #4169e1;
+      --blue-light: #edf2ff;
+      --text: #1d2939;
+      --muted: #667085;
+      --border: #e6eaf0;
+      --bg: #f6f8fb;
+      --white: #fff;
+      --green: #16845b;
+      --green-light: #e7f6ef;
+      --red: #c33d48;
+      --red-light: #fff0f0;
+      --amber: #a86609;
+      --amber-light: #fff5df;
+      --shadow: 0 8px 26px rgba(25, 39, 67, .06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 252px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 22px 15px 16px;
+      color: #d8e1ef;
+      background: var(--navy);
+      z-index: 30;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 3px 10px 25px;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 39px;
+      height: 39px;
+      place-items: center;
+      border-radius: 12px;
+      color: #fff;
+      background: var(--blue);
+      font-weight: 800;
+      font-size: 19px;
+    }
+
+    .brand-title { color: #fff; font-weight: 750; font-size: 14px; }
+    .brand-subtitle { margin-top: 3px; color: #9fb0c8; font-size: 11px; }
+
+    .nav-label {
+      padding: 11px 11px 8px;
+      color: #8193ad;
+      font-size: 10px;
+      letter-spacing: .12em;
+      font-weight: 750;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .nav-link {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 11px;
+      color: #c2ccda;
+      background: transparent;
+      border: 0;
+      border-radius: 9px;
+      text-align: left;
+      font-size: 13px;
+      transition: .16s ease;
+    }
+
+    .nav-link:hover { color: #fff; background: rgba(255,255,255,.07); }
+    .nav-link.active { color: #fff; background: #2b4265; }
+    .nav-icon { width: 20px; text-align: center; font-size: 17px; }
+
+    .sidebar-bottom { margin-top: auto; }
+
+    .warehouse-card {
+      padding: 13px 12px;
+      margin: 14px 3px 0;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 11px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .warehouse-row { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 12px; }
+    .online-dot { width: 8px; height: 8px; border-radius: 50%; background: #47ce91; }
+    .warehouse-small { margin: 6px 0 0 16px; color: #9fb0c8; font-size: 11px; }
+
+    .content { min-width: 0; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      height: 68px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 32px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-left, .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .breadcrumbs { color: var(--muted); font-size: 12px; }
+    .breadcrumbs strong { color: var(--text); font-size: 13px; }
+    .topbar-right { gap: 12px; }
+
+    .search-box {
+      display: flex;
+      width: min(300px, 32vw);
+      align-items: center;
+      gap: 8px;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: #fbfcfe;
+      color: #98a2b3;
+    }
+
+    .search-box input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      color: var(--text);
+      background: transparent;
+      font-size: 12px;
+    }
+
+    .demo-pill {
+      padding: 5px 8px;
+      color: #7a5100;
+      background: #fff2ce;
+      border-radius: 20px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+
+    .avatar {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 50%;
+      color: #355ac6;
+      background: #e9efff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .user-name { color: #344054; font-size: 12px; font-weight: 650; white-space: nowrap; }
+
+    .menu-toggle {
+      display: none;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      background: #fff;
+      font-size: 19px;
+    }
+
+    .main {
+      width: min(1480px, 100%);
+      padding: 30px 34px 42px;
+      margin: 0 auto;
+    }
+
+    .page-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--blue);
+      font-size: 10px;
+      letter-spacing: .12em;
+      font-weight: 800;
+    }
+
+    h1 { margin: 0; color: var(--text); font-size: 26px; letter-spacing: -.035em; }
+    .page-subtitle { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+
+    .actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      transition: .16s ease;
+    }
+
+    .btn-primary { color: #fff; background: var(--blue); }
+    .btn-primary:hover { background: #3156c5; }
+    .btn-secondary { color: #344054; border-color: var(--border); background: #fff; }
+    .btn-secondary:hover { background: #f8f9fc; }
+    .btn-small { min-height: 32px; padding: 0 10px; font-size: 11px; }
+    .btn-danger { color: var(--red); border-color: #f3d0d2; background: #fff; }
+
+    .demo-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 11px 13px;
+      margin-bottom: 18px;
+      border: 1px solid #f2dfaa;
+      border-radius: 9px;
+      color: #76530d;
+      background: #fffaf0;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .demo-alert strong { color: #674600; }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card, .card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card { min-height: 137px; padding: 16px; }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .stat-label { color: var(--muted); font-size: 11px; font-weight: 650; }
+    .stat-icon {
+      display: grid;
+      width: 33px;
+      height: 33px;
+      place-items: center;
+      border-radius: 9px;
+      font-size: 16px;
+    }
+
+    .stat-value { margin-top: 13px; font-size: 25px; font-weight: 780; letter-spacing: -.04em; }
+    .stat-note { margin-top: 5px; color: #8a94a4; font-size: 10px; }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(300px, .85fr);
+      gap: 15px;
+      margin-bottom: 16px;
+    }
+
+    .card { min-width: 0; padding: 18px; }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .card-title { margin: 0; font-size: 14px; font-weight: 750; }
+    .card-description { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+
+    .chart-plot {
+      display: flex;
+      height: 190px;
+      align-items: stretch;
+      gap: 10px;
+      padding: 12px 4px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bar-column {
+      display: flex;
+      flex: 1;
+      min-width: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .bar {
+      width: min(32px, 65%);
+      min-height: 7px;
+      border-radius: 7px 7px 2px 2px;
+      background: #cbd7fb;
+    }
+
+    .bar.today { background: linear-gradient(180deg, #6385ef, #4169e1); }
+    .bar-label { padding-bottom: 9px; color: #8791a1; font-size: 10px; }
+
+    .chart-legend { display: flex; align-items: center; gap: 7px; margin-top: 12px; color: var(--muted); font-size: 10px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+
+    .stock-list { display: grid; gap: 13px; }
+    .stock-item-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .stock-name { overflow: hidden; color: #344054; font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+    .stock-amount { color: var(--red); font-size: 10px; font-weight: 750; white-space: nowrap; }
+    .stock-min { margin-top: 4px; color: #98a2b3; font-size: 10px; }
+    .progress-track { height: 5px; margin-top: 8px; overflow: hidden; border-radius: 5px; background: #f0f1f4; }
+    .progress-fill { height: 100%; border-radius: inherit; background: #e06b72; }
+
+    .table-card { padding: 0; overflow: hidden; }
+    .table-card-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 17px 18px; }
+    .table-scroll { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      padding: 11px 15px;
+      border-top: 1px solid #edf0f4;
+      border-bottom: 1px solid #edf0f4;
+      color: #778194;
+      background: #fafbfd;
+      font-size: 10px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #f0f2f5;
+      color: #475467;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #fbfcff; }
+    .table-primary { color: #27364a; font-weight: 700; }
+    .table-muted { display: block; margin-top: 3px; color: #98a2b3; font-size: 10px; }
+    .number-cell { font-variant-numeric: tabular-nums; font-weight: 650; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 20px;
+      font-size: 9px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .status-badge::before { width: 5px; height: 5px; border-radius: 50%; background: currentColor; content: ""; }
+    .status-success { color: var(--green); background: var(--green-light); }
+    .status-info { color: #355ac6; background: #edf2ff; }
+    .status-warning { color: var(--amber); background: var(--amber-light); }
+    .empty-note { padding: 22px 15px; color: var(--muted); text-align: center; font-size: 12px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 13px 16px;
+      border-top: 1px solid #edf0f4;
+      border-bottom: 1px solid #edf0f4;
+      background: #fff;
+    }
+
+    .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .filter-select, .field-input, .field-select {
+      min-height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      color: #344054;
+      background: #fff;
+      font-size: 11px;
+    }
+
+    .filter-select:focus, .field-input:focus, .field-select:focus { border-color: #9bb0f3; box-shadow: 0 0 0 3px #edf2ff; }
+
+    .page-count { color: #8791a1; font-size: 10px; }
+
+    .module-card {
+      display: grid;
+      min-height: 360px;
+      place-items: center;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .module-icon {
+      display: grid;
+      width: 56px;
+      height: 56px;
+      place-items: center;
+      margin: 0 auto 14px;
+      border-radius: 16px;
+      color: var(--blue);
+      background: var(--blue-light);
+      font-size: 25px;
+    }
+
+    .module-card h2 { margin: 0; font-size: 18px; }
+    .module-card p { max-width: 490px; margin: 9px auto 18px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(13, 24, 42, .48);
+    }
+
+    .modal {
+      width: min(700px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,.5);
+      border-radius: 15px;
+      background: #fff;
+      box-shadow: 0 22px 70px rgba(10, 20, 35, .22);
+    }
+
+    .modal.modal-wide { width: min(840px, 100%); }
+    .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 15px; }
+    .modal-head h2 { margin: 0; font-size: 18px; }
+    .modal-close {
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #667085;
+      background: #fff;
+      font-size: 18px;
+    }
+
+    .modal-copy { margin: 0 0 15px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 17px; }
+
+    .drop-zone {
+      display: grid;
+      min-height: 126px;
+      place-items: center;
+      padding: 18px;
+      border: 1px dashed #aab9e8;
+      border-radius: 11px;
+      color: #44516a;
+      background: #fafbff;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .drop-zone:hover { border-color: var(--blue); background: #f4f6ff; }
+    .drop-icon { margin-bottom: 6px; color: var(--blue); font-size: 24px; }
+    .drop-zone strong { font-size: 12px; }
+    .drop-zone small { margin-top: 5px; color: #8993a4; font-size: 10px; }
+    .drop-zone input { display: none; }
+
+    .template-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 15px; }
+    .template-line span { color: var(--muted); font-size: 10px; }
+
+    .import-result { margin-top: 13px; }
+    .result-box { padding: 12px; border: 1px solid var(--border); border-radius: 9px; background: #fcfdff; }
+    .result-title { color: #27364a; font-size: 12px; font-weight: 750; }
+    .result-copy { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .warning-copy { margin-top: 7px; color: #9a5c00; font-size: 10px; line-height: 1.5; }
+    .preview-table { margin-top: 10px; }
+    .preview-table th, .preview-table td { padding: 8px 9px; font-size: 10px; }
+    .preview-status-good { color: var(--green); font-weight: 750; }
+    .preview-status-bad { color: var(--red); font-weight: 750; }
+
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { color: #475467; font-size: 10px; font-weight: 700; }
+    .field-input, .field-select { width: 100%; min-height: 38px; }
+    .line-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 17px 0 9px; }
+    .line-heading strong { font-size: 12px; }
+    .ship-lines { display: grid; gap: 8px; }
+    .ship-line { display: grid; grid-template-columns: minmax(0, 1fr) 110px 34px; gap: 8px; }
+    .ship-line select, .ship-line input {
+      min-width: 0;
+      height: 37px;
+      padding: 0 9px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: 0;
+      color: #344054;
+      background: #fff;
+      font-size: 10px;
+    }
+
+    .remove-line {
+      border: 1px solid #f1d6d7;
+      border-radius: 8px;
+      color: var(--red);
+      background: #fff;
+      font-size: 16px;
+    }
+
+    .form-error { min-height: 16px; margin-top: 8px; color: var(--red); font-size: 10px; }
+    .prototype-note { margin-top: 12px; padding: 9px 10px; border-radius: 8px; color: #7a5100; background: #fff7e5; font-size: 10px; line-height: 1.5; }
+
+    .waybill {
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .waybill-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+    .waybill-label { color: var(--blue); font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+    .waybill-no { margin-top: 5px; font-size: 19px; font-weight: 800; }
+    .waybill-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px 0; }
+    .meta-label { color: #8a94a4; font-size: 9px; }
+    .meta-value { margin-top: 4px; color: #344054; font-size: 11px; font-weight: 700; }
+    .signature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 25px; }
+    .signature { min-height: 60px; padding-top: 8px; border-top: 1px solid #d6dbe3; color: #667085; font-size: 9px; text-align: center; }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 150;
+      max-width: min(370px, calc(100vw - 40px));
+      padding: 11px 14px;
+      border-radius: 9px;
+      color: #fff;
+      background: #26364f;
+      box-shadow: var(--shadow);
+      font-size: 11px;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: .2s ease;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    tr[hidden] { display: none; }
+
+    #sidebarBackdrop { display: none; }
+
+    @media (max-width: 1050px) {
+      .app-shell { grid-template-columns: 224px minmax(0, 1fr); }
+      .main { padding: 26px 22px 36px; }
+      .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dashboard-grid { grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); }
+      .topbar { padding: 0 22px; }
+    }
+
+    @media (max-width: 760px) {
+      .app-shell { display: block; }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        width: 252px;
+        transform: translateX(-102%);
+        transition: transform .22s ease;
+      }
+
+      .sidebar.open { transform: translateX(0); }
+      #sidebarBackdrop.show {
+        position: fixed;
+        inset: 0;
+        z-index: 25;
+        display: block;
+        background: rgba(13, 24, 42, .35);
+      }
+
+      .menu-toggle { display: inline-grid; place-items: center; }
+      .topbar { height: 62px; padding: 0 14px; }
+      .search-box { width: min(210px, 39vw); }
+      .user-name { display: none; }
+      .topbar-right { gap: 8px; }
+      .main { padding: 22px 14px 32px; }
+      .page-heading { align-items: flex-start; flex-direction: column; }
+      .page-heading h1 { font-size: 23px; }
+      .actions { width: 100%; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .stat-grid { gap: 9px; }
+      .stat-card { min-height: 123px; padding: 12px; }
+      .stat-value { font-size: 22px; }
+      .stat-label { font-size: 10px; }
+      .card { padding: 14px; }
+      .table-card { padding: 0; }
+      .table-card-header { padding: 14px; }
+      .actions .btn { flex: 1; padding: 0 8px; font-size: 10px; }
+      .demo-pill { display: none; }
+      .field-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .ship-line { grid-template-columns: minmax(0, 1fr) 82px 32px; }
+      .waybill { padding: 13px; }
+      .waybill-no { font-size: 15px; }
+      .modal { padding: 16px; }
+      .chart-plot { height: 160px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        <div>
+          <div class="brand-title">Gudang & Distribusi</div>
+          <div class="brand-subtitle">Sistem manajemen stok</div>
+        </div>
+      </div>
+
+      <div class="nav-label">MENU UTAMA</div>
+      <nav class="nav-list">
+        <button class="nav-link active" data-page="dashboard"><span class="nav-icon">▦</span>Ringkasan</button>
+        <button class="nav-link" data-page="inventory"><span class="nav-icon">▣</span>Barang & stok</button>
+        <button class="nav-link" data-page="shipments"><span class="nav-icon">⇄</span>Pengiriman</button>
+        <button class="nav-link" data-page="incoming"><span class="nav-icon">⇩</span>Barang masuk</button>
+        <button class="nav-link" data-page="stocktake"><span class="nav-icon">☷</span>Stock opname</button>
+        <button class="nav-link" data-page="reports"><span class="nav-icon">▤</span>Laporan</button>
+      </nav>
+
+      <div class="nav-label">PENGELOLAAN</div>
+      <nav class="nav-list">
+        <button class="nav-link" data-page="branches"><span class="nav-icon">⌖</span>Cabang & staging</button>
+        <button class="nav-link" data-page="users"><span class="nav-icon">♙</span>Pengguna</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="warehouse-card">
+          <div class="warehouse-row"><span class="online-dot"></span><strong>Gudang utama</strong></div>
+          <div class="warehouse-small">1 lokasi pusat</div>
+        </div>
+      </div>
+    </aside>
+
+    <div id="sidebarBackdrop"></div>
+
+    <section class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle" aria-label="Buka menu">☰</button>
+          <div class="breadcrumbs">Workspace <span> / </span> <strong id="pageTitle">Ringkasan</strong></div>
+        </div>
+
+        <div class="topbar-right">
+          <label class="search-box">
+            <span>⌕</span>
+            <input id="globalSearch" type="search" placeholder="Cari barang atau surat jalan">
+          </label>
+          <span class="demo-pill">PROTOTIPE</span>
+          <div class="avatar">AD</div>
+          <div class="user-name">Admin Gudang</div>
+        </div>
+      </header>
+
+      <main class="main" id="main"></main>
+    </section>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="toast" class="toast"></div>
+
+  <!-- Membaca file Excel .xlsx. Perlu koneksi internet saat membuka halaman. -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    const productSeed = [
+      { name: "AWB Roll", stock: 1240, min: 300 },
+      { name: "S Fragile", stock: 28, min: 50 },
+      { name: "S XRT", stock: 510, min: 100 },
+      { name: "S Failed Delivery", stock: 24, min: 40 },
+      { name: "S Return", stock: 35, min: 40 },
+      { name: "S Seal", stock: 880, min: 200 },
+      { name: "S F&B", stock: 92, min: 20 },
+      { name: "S COD", stock: 60, min: 15 },
+      { name: "S ND", stock: 140, min: 30 },
+      { name: "S SDS", stock: 32, min: 20 },
+      { name: "Mother bag", stock: 225, min: 50 },
+      { name: "Lakban Bening", stock: 40, min: 50 },
+      { name: "Kabel Ties Hitam", stock: 80, min: 30 },
+      { name: "Kabel Ties biru", stock: 100, min: 30 },
+      { name: "Kabel Ties Hijau", stock: 56, min: 20 },
+      { name: "Kabel Ties Pink", stock: 70, min: 20 },
+      { name: "Polymailer", stock: 300, min: 75 },
+      { name: "Bagseal Putih", stock: 45, min: 30 }
+    ];
+
+    const products = productSeed.map(p => ({ ...p, unit: "unit" }));
+    const hubs = ["AMB", "BAU", "BJM", "BPP", "GTO", "JAP", "KDI", "MKS", "MND", "PAL", "PLK", "SMR", "SON", "TAR", "TTE"];
+
+    function dateOffset(days) {
+      const date = new Date();
+      date.setDate(date.getDate() + days);
+      return date.toISOString();
+    }
+
+    function shipmentNo(number) {
+      return `SJ/${new Date().getFullYear()}/${String(number).padStart(4, "0")}`;
+    }
+
+    let shipments = [
+      { number: shipmentNo(18), date: dateOffset(-1), hub: "BJM", staging: "LKTU0", items: 6, qty: 83, status: "Dalam perjalanan", awb: "", lines: [] },
+      { number: shipmentNo(17), date: dateOffset(-2), hub: "MKS", staging: "PRP00", items: 8, qty: 121, status: "Menunggu konfirmasi", awb: "", lines: [] },
+      { number: shipmentNo(16), date: dateOffset(-3), hub: "BPP", staging: "BAMPO", items: 5, qty: 57, status: "Diterima", awb: "AB123456", lines: [] },
+      { number: shipmentNo(15), date: dateOffset(-5), hub: "AMB", staging: "BTMRO", items: 3, qty: 38, status: "Diterima", awb: "", lines: [] }
+    ];
+
+    let activePage = "dashboard";
+    let nextShipmentSequence = 19;
+    let createdShipmentCount = 0;
+    let toastTimer;
+
+    const pageTitles = {
+      dashboard: "Ringkasan",
+      inventory: "Barang & stok",
+      shipments: "Pengiriman",
+      incoming: "Barang masuk",
+      stocktake: "Stock opname",
+      reports: "Laporan",
+      branches: "Cabang & staging",
+      users: "Pengguna"
+    };
+
+    const pageDescriptions = {
+      incoming: "Pencatatan penerimaan barang dari pemasok atau sumber lain ke gudang pusat.",
+      stocktake: "Pencatatan stok fisik gudang dan selisih terhadap stok di sistem.",
+      reports: "Ringkasan dan laporan stok gudang serta pengiriman ke cabang.",
+      branches: "Pengelolaan daftar HUB sebagai area dan STAGING sebagai cabang.",
+      users: "Pengelolaan akun dengan akses Admin, Staff Gudang, Cabang, dan Visitor."
+    };
+
+    const numberFormat = new Intl.NumberFormat("id-ID");
+    const dateFormat = new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[char]));
+    }
+
+    function formatDate(value) {
+      return dateFormat.format(new Date(value));
+    }
+
+    function greeting() {
+      const hour = new Date().getHours();
+      if (hour < 11) return "Selamat pagi";
+      if (hour < 15) return "Selamat siang";
+      if (hour < 19) return "Selamat sore";
+      return "Selamat malam";
+    }
+
+    function getLowStock() {
+      return products.filter(product => product.stock <= product.min);
+    }
+
+    function statusClass(status) {
+      if (status === "Diterima") return "status-success";
+      if (status === "Dalam perjalanan") return "status-info";
+      return "status-warning";
+    }
+
+    function shipmentRows(list, includeAwb = false) {
+      return list.map(shipment => {
+        const search = `${shipment.number} ${shipment.hub} ${shipment.staging} ${shipment.awb} ${shipment.status} ${shipment.qty}`;
+        return `
+          <tr data-row data-search="${escapeHtml(search)}"
+              data-status="${escapeHtml(shipment.status)}"
+              data-hub="${escapeHtml(shipment.hub)}">
+            <td>
+              <span class="table-primary">${escapeHtml(shipment.number)}</span>
+              <span class="table-muted">Surat jalan otomatis</span>
+            </td>
+            <td>${formatDate(shipment.date)}</td>
+            <td><span class="table-primary">${escapeHtml(shipment.hub)}</span><span class="table-muted">${escapeHtml(shipment.staging)}</span></td>
+            <td class="number-cell">${numberFormat.format(shipment.items)} jenis</td>
+            <td class="number-cell">${numberFormat.format(shipment.qty)}</td>
+            ${includeAwb ? `<td>${shipment.awb ? escapeHtml(shipment.awb) : '<span class="table-muted">Opsional</span>'}</td>` : ""}
+            <td><span class="status-badge ${statusClass(shipment.status)}">${escapeHtml(shipment.status)}</span></td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderDashboard() {
+      const lowStock = getLowStock();
+      const totalStock = products.reduce((total, product) => total + product.stock, 0);
+      const recentShipments = shipments.slice(0, 5);
+
+      const lowStockHtml = lowStock.length
+        ? lowStock.slice(0, 5).map(product => {
+            const percent = Math.min(100, Math.round((product.stock / product.min) * 100));
+            return `
+              <div>
+                <div class="stock-item-top">
+                  <span class="stock-name">${escapeHtml(product.name)}</span>
+                  <span class="stock-amount">${numberFormat.format(product.stock)} unit</span>
+                </div>
+                <div class="stock-min">Batas minimum ${numberFormat.format(product.min)} unit</div>
+                <div class="progress-track"><div class="progress-fill" style="width:${percent}%"></div></div>
+              </div>
+            `;
+          }).join("")
+        : `<div class="empty-note">Tidak ada barang di bawah stok minimum.</div>`;
+
+      const chartValues = [42, 59, 45, 76, 62, 88, 54];
+      const weekdays = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+      const chartHtml = chartValues.map((value, index) => `
+        <div class="bar-column">
+          <div class="bar ${index === 5 ? "today" : ""}" style="height:${value}%"></div>
+          <span class="bar-label">${weekdays[index]}</span>
+        </div>
+      `).join("");
+
+      return `
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">RINGKASAN GUDANG</p>
+            <h1>${greeting()}, Admin</h1>
+            <p class="page-subtitle">Pantau stok gudang dan pengiriman ke cabang.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-secondary" data-action="import">⇧ Impor Excel</button>
+            <button class="btn btn-primary" data-action="new-shipment">＋ Buat pengiriman</button>
+          </div>
+        </section>
+
+        <div class="demo-alert">
+          <span>ⓘ</span>
+          <div><strong>Mode prototipe.</strong> Angka stok dan pengiriman pada layar ini adalah data contoh. Data nyata belum tersimpan ke database.</div>
+        </div>
+
+        <section class="stat-grid">
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Jenis barang</span><span class="stat-icon" style="color:#4169e1;background:#edf2ff">▣</span></div>
+            <div class="stat-value">${numberFormat.format(products.length)}</div>
+            <div class="stat-note">Barang pada daftar inventori</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Total stok gudang</span><span class="stat-icon" style="color:#16845b;background:#e7f6ef">▤</span></div>
+            <div class="stat-value">${numberFormat.format(totalStock)}</div>
+            <div class="stat-note">Unit contoh di gudang pusat</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Perlu restock</span><span class="stat-icon" style="color:#c33d48;background:#fff0f0">!</span></div>
+            <div class="stat-value">${numberFormat.format(lowStock.length)}</div>
+            <div class="stat-note">Barang sama atau di bawah batas minimum</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span class="stat-label">Pengiriman bulan ini</span><span class="stat-icon" style="color:#a86609;background:#fff5df">⇄</span></div>
+            <div class="stat-value">${numberFormat.format(64 + createdShipmentCount)}</div>
+            <div class="stat-note">Angka contoh untuk tampilan dashboard</div>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Aktivitas pengiriman</h2>
+                <p class="card-description">Ringkasan contoh aktivitas selama 7 hari terakhir</p>
+              </div>
+              <span class="page-count">7 hari</span>
+            </div>
+            <div class="chart-plot">${chartHtml}</div>
+            <div class="chart-legend"><span class="legend-dot"></span> Pengiriman ke cabang</div>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Stok perlu diperhatikan</h2>
+                <p class="card-description">Barang yang menyentuh batas minimum</p>
+              </div>
+              <button class="btn btn-secondary btn-small" data-page="inventory">Lihat stok</button>
+            </div>
+            <div class="stock-list">${lowStockHtml}</div>
+          </article>
+        </section>
+
+        <section class="card table-card">
+          <div class="table-card-header">
+            <div>
+              <h2 class="card-title">Pengiriman terbaru</h2>
+              <p class="card-description">Surat jalan dan status pengiriman ke cabang</p>
+            </div>
+            <button class="btn btn-secondary btn-small" data-page="shipments">Lihat semua</button>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>No. surat jalan</th><th>Tanggal</th><th>Tujuan</th><th>Barang</th><th>Total unit</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                ${recentShipments.length ? shipmentRows(recentShipments) : '<tr><td colspan="6" class="empty-note">Belum ada pengiriman.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderInventory() {
+      const rows = products.map(product => {
+        const low = product.stock <= product.min;
+        const search = `${product.name} ${product.stock} ${product.min} ${low ? "menipis" : "aman"}`;
+        return `
+          <tr data-row data-search="${escapeHtml(search)}" data-stockstate="${low ? "low" : "safe"}">
+            <td><span class="table-primary">${escapeHtml(product.name)}</span></td>
+            <td class="number-cell">${numberFormat.format(product.stock)}</td>
+            <td>unit</td>
+            <td class="number-cell">${numberFormat.format(product.min)}</td>
+            <td><span class="status-badge ${low ? "status-warning" : "status-success"}">${low ? "Menipis" : "Aman"}</span></td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">INVENTORI GUDANG PUSAT</p>
+            <h1>Barang & stok</h1>
+            <p class="page-subtitle">Pantau jumlah stok dan batas minimum setiap barang.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-secondary" data-action="import">⇧ Impor Excel</button>
+          </div>
+        </section>
+
+        <div class="demo-alert">
+          <span>ⓘ</span>
+          <div>Stok dan batas minimum di bawah ini adalah <strong>data contoh</strong>. Satuan saat ini ditampilkan sebagai “unit” sampai satuan tiap barang ditentukan.</div>
+        </div>
+
+        <section class="card table-card">
+          <div class="table-card-header">
+            <div>
+              <h2 class="card-title">Daftar barang</h2>
+              <p class="card-description">${products.length} jenis barang terdaftar pada prototipe</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="toolbar-left"><span class="page-count">Filter stok:</span>
+              <select class="filter-select" id="stockFilter">
+                <option value="all">Semua barang</option>
+                <option value="low">Stok menipis</option>
+                <option value="safe">Stok aman</option>
+              </select>
+            </div>
+            <div class="toolbar-right"><span class="page-count">Pencarian menggunakan kolom di bagian atas</span></div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Nama barang</th><th>Stok gudang</th><th>Satuan</th><th>Batas minimum</th><th>Status</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderShipments() {
+      const hubsInData = [...new Set(shipments.map(item => item.hub))];
+      const hubOptions = hubsInData.map(hub => `<option value="${escapeHtml(hub)}">${escapeHtml(hub)}</option>`).join("");
+
+      return `
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">DISTRIBUSI CABANG</p>
+            <h1>Pengiriman</h1>
+            <p class="page-subtitle">Pantau surat jalan, tujuan HUB–STAGING, dan status penerimaan.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-secondary" data-action="import">⇧ Impor Excel</button>
+            <button class="btn btn-primary" data-action="new-shipment">＋ Buat pengiriman</button>
+          </div>
+        </section>
+
+        <div class="demo-alert">
+          <span>ⓘ</span>
+          <div>Setiap pengiriman demo yang dibuat akan mendapat nomor surat jalan otomatis. Nomor resi/AWB bersifat opsional.</div>
+        </div>
+
+        <section class="card table-card">
+          <div class="table-card-header">
+            <div>
+              <h2 class="card-title">Riwayat pengiriman</h2>
+              <p class="card-description">${shipments.length} transaksi contoh pada sesi ini</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <select class="filter-select" id="statusFilter">
+                <option value="all">Semua status</option>
+                <option value="Dalam perjalanan">Dalam perjalanan</option>
+                <option value="Menunggu konfirmasi">Menunggu konfirmasi</option>
+                <option value="Diterima">Diterima</option>
+              </select>
+              <select class="filter-select" id="hubFilter">
+                <option value="all">Semua HUB</option>
+                ${hubOptions}
+              </select>
+            </div>
+            <div class="toolbar-right"><span class="page-count">Cari nomor surat jalan atau cabang melalui kolom pencarian</span></div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>No. surat jalan</th><th>Tanggal</th><th>Tujuan</th><th>Barang</th><th>Total unit</th><th>Resi / AWB</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                ${shipments.length ? shipmentRows(shipments, true) : '<tr><td colspan="7" class="empty-note">Belum ada pengiriman.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderPlaceholder(page) {
+      const title = pageTitles[page] || "Modul";
+      const description = pageDescriptions[page] || "Modul ini sedang disiapkan.";
+      return `
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">GUDANG & DISTRIBUSI</p>
+            <h1>${escapeHtml(title)}</h1>
+            <p class="page-subtitle">${escapeHtml(description)}</p>
+          </div>
+        </section>
+        <section class="card module-card">
+          <div>
+            <div class="module-icon">⌁</div>
+            <h2>Modul berikutnya</h2>
+            <p>Dashboard dan tampilan dasar stok/pengiriman sudah dibuat sebagai prototipe. Modul ini akan dilanjutkan setelah struktur database, login, dan aturan hak akses disiapkan.</p>
+            <button class="btn btn-primary" data-page="dashboard">Kembali ke ringkasan</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderPage() {
+      document.getElementById("pageTitle").textContent = pageTitles[activePage] || "Ringkasan";
+      const main = document.getElementById("main");
+
+      if (activePage === "dashboard") main.innerHTML = renderDashboard();
+      else if (activePage === "inventory") main.innerHTML = renderInventory();
+      else if (activePage === "shipments") main.innerHTML = renderShipments();
+      else main.innerHTML = renderPlaceholder(activePage);
+
+      applyFilters();
+    }
+
+    function setPage(page) {
+      if (!pageTitles[page]) return;
+      activePage = page;
+
+      document.querySelectorAll(".nav-link").forEach(link => {
+        link.classList.toggle("active", link.dataset.page === page);
+      });
+
+      document.getElementById("sidebar").classList.remove("open");
+      document.getElementById("sidebarBackdrop").classList.remove("show");
+      renderPage();
+    }
+
+    function applyFilters() {
+      const query = (document.getElementById("globalSearch")?.value || "").trim().toLowerCase();
+      const stockFilter = document.getElementById("stockFilter")?.value || "all";
+      const statusFilter = document.getElementById("statusFilter")?.value || "all";
+      const hubFilter = document.getElementById("hubFilter")?.value || "all";
+
+      document.querySelectorAll("#main tbody tr[data-row]").forEach(row => {
+        let visible = (row.dataset.search || "").toLowerCase().includes(query);
+
+        if (activePage === "inventory" && stockFilter !== "all") {
+          visible = visible && row.dataset.stockstate === stockFilter;
+        }
+
+        if (activePage === "shipments") {
+          if (statusFilter !== "all") visible = visible && row.dataset.status === statusFilter;
+          if (hubFilter !== "all") visible = visible && row.dataset.hub === hubFilter;
+        }
+
+        row.hidden = !visible;
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+
+    function closeModal() {
+      document.getElementById("modalRoot").innerHTML = "";
+    }
+
+    function downloadTemplate() {
+      const headers = ["HUB", "STAGING", ...products.map(product => product.name)];
+      const sample = ["BJM", "LKTU0", ...products.map(() => "0")];
+
+      function csvCell(value) {
+        return `"${String(value).replace(/"/g, '""')}"`;
+      }
+
+      const content = "\uFEFF" + [headers, sample].map(row => row.map(csvCell).join(",")).join("\r\n");
+      const blob = new Blob([content], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "template-pengiriman-cabang.csv";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function openImportModal() {
+      document.getElementById("modalRoot").innerHTML = `
+        <div class="modal-backdrop" id="modalBackdrop">
+          <section class="modal modal-wide" role="dialog" aria-modal="true">
+            <div class="modal-head">
+              <div>
+                <p class="eyebrow">IMPOR PENGIRIMAN</p>
+                <h2>Unggah daftar barang yang akan dikirim</h2>
+              </div>
+              <button class="modal-close" data-action="close-modal" aria-label="Tutup">×</button>
+            </div>
+
+            <p class="modal-copy">
+              Baris pertama harus berisi <strong>HUB</strong>, <strong>STAGING</strong>, lalu nama 18 barang.
+              Setiap baris berikutnya adalah satu tujuan cabang. Angka 0 atau kolom kosong berarti barang tidak dikirim.
+            </p>
+
+            <label class="drop-zone">
+              <span>
+                <span class="drop-icon">⇧</span><br>
+                <strong>Pilih file Excel atau CSV</strong><br>
+                <small>Format .xlsx, .xls, atau .csv</small>
+              </span>
+              <input id="excelFile" type="file" accept=".xlsx,.xls,.csv">
+            </label>
+
+            <div class="template-line">
+              <span>Belum punya template? Unduh template yang bisa dibuka di Excel.</span>
+              <button class="btn btn-secondary btn-small" data-action="download-template">Unduh template</button>
+            </div>
+
+            <div class="import-result" id="importResult"></div>
+
+            <div class="modal-actions">
+              <button class="btn btn-secondary" data-action="close-modal">Tutup</button>
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function splitCsvLine(line, delimiter) {
+      const result = [];
+      let value = "";
+      let quoted = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+
+        if (char === '"' && quoted && line[i + 1] === '"') {
+          value += '"';
+          i++;
+        } else if (char === '"') {
+          quoted = !quoted;
+        } else if (char === delimiter && !quoted) {
+          result.push(value);
+          value = "";
+        } else {
+          value += char;
+        }
+      }
+
+      result.push(value);
+      return result;
+    }
+
+    function parseCsv(text) {
+      const clean = text.replace(/^\uFEFF/, "");
+      const firstLine = clean.split(/\r?\n/)[0] || "";
+      const delimiter = (firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length ? ";" : ",";
+
+      return clean
+        .split(/\r?\n/)
+        .filter(line => line.trim() !== "")
+        .map(line => splitCsvLine(line, delimiter));
+    }
+
+    async function readSpreadsheet(file) {
+      const extension = file.name.split(".").pop().toLowerCase();
+
+      if (extension === "csv") {
+        return parseCsv(await file.text());
+      }
+
+      if (!window.XLSX) {
+        throw new Error("Pembaca Excel belum tersedia. Pastikan perangkat terhubung ke internet, lalu muat ulang halaman.");
+      }
+
+      const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      return XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+    }
+
+    function normalizeHeader(value) {
+      return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+    }
+
+    function parseQuantity(value) {
+      if (value === null || value === undefined || String(value).trim() === "") return 0;
+      let text = String(value).trim().replace(/\s/g, "");
+
+      if (text.includes(",") && !text.includes(".")) text = text.replace(",", ".");
+      else text = text.replace(/,/g, "");
+
+      return Number(text);
+    }
+
+    function validateSpreadsheet(rows) {
+      const nonEmptyRows = rows.filter(row => row.some(cell => String(cell ?? "").trim() !== ""));
+      if (nonEmptyRows.length < 2) throw new Error("File belum berisi baris data.");
+
+      const headers = nonEmptyRows[0].map(normalizeHeader);
+      const hubIndex = headers.indexOf("hub");
+      const stagingIndex = headers.indexOf("staging");
+
+      if (hubIndex < 0 || stagingIndex < 0) {
+        throw new Error("Kolom HUB dan STAGING wajib tersedia pada baris pertama.");
+      }
+
+      const productIndexes = products.map(product => headers.indexOf(normalizeHeader(product.name)));
+      const missingProducts = products
+        .filter((product, index) => productIndexes[index] < 0)
+        .map(product => product.name);
+
+      const entries = nonEmptyRows.slice(1).map(row => {
+        const hub = String(row[hubIndex] ?? "").trim();
+        const staging = String(row[stagingIndex] ?? "").trim();
+        let total = 0;
+        let itemCount = 0;
+        const errors = [];
+
+        if (!hub) errors.push("HUB kosong");
+        if (!staging) errors.push("STAGING kosong");
+
+        products.forEach((product, index) => {
+          const columnIndex = productIndexes[index];
+          if (columnIndex < 0) return;
+
+          const rawValue = row[columnIndex];
+          const quantity = parseQuantity(rawValue);
+
+          if (!Number.isFinite(quantity) || quantity < 0 || !Number.isInteger(quantity)) {
+            errors.push(`Jumlah ${product.name} harus berupa angka bulat 0 atau lebih`);
+            return;
+          }
+
+          if (quantity > 0) {
+            total += quantity;
+            itemCount++;
+          }
+        });
+
+        if (itemCount === 0) errors.push("Tidak ada jumlah barang di atas 0");
+        return { hub, staging, total, itemCount, errors };
+      });
+
+      return { entries, missingProducts };
+    }
+
+    function renderImportPreview(result, filename) {
+      const validCount = result.entries.filter(entry => entry.errors.length === 0).length;
+      const totalUnits = result.entries.reduce((sum, entry) => sum + entry.total, 0);
+      const missingText = result.missingProducts.length
+        ? `<div class="warning-copy"><strong>Kolom barang belum ditemukan:</strong> ${escapeHtml(result.missingProducts.join(", "))}</div>`
+        : "";
+
+      const rows = result.entries.slice(0, 8).map(entry => `
+        <tr>
+          <td>${escapeHtml(entry.hub || "—")}</td>
+          <td>${escapeHtml(entry.staging || "—")}</td>
+          <td>${numberFormat.format(entry.itemCount)}</td>
+          <td>${numberFormat.format(entry.total)}</td>
+          <td class="${entry.errors.length ? "preview-status-bad" : "preview-status-good"}">${entry.errors.length ? "Perlu dicek" : "Siap"}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("importResult").innerHTML = `
+        <div class="result-box">
+          <div class="result-title">File terbaca: ${escapeHtml(filename)}</div>
+          <p class="result-copy">
+            ${result.entries.length} baris tujuan · ${validCount} baris siap diperiksa ·
+            total ${numberFormat.format(totalUnits)} unit pada data contoh.
+          </p>
+          ${missingText}
+          ${result.entries.length > 8 ? `<p class="result-copy">Pratinjau menampilkan 8 baris pertama.</p>` : ""}
+          <div class="table-scroll">
+            <table class="preview-table">
+              <thead><tr><th>HUB</th><th>STAGING</th><th>Jenis barang</th><th>Total unit</th><th>Pemeriksaan</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+          <p class="warning-copy">Ini hanya pratinjau prototipe. Data belum disimpan atau mengurangi stok gudang.</p>
+        </div>
+      `;
+    }
+
+    async function handleExcelFile(file) {
+      if (!file) return;
+
+      const resultBox = document.getElementById("importResult");
+      resultBox.innerHTML = `<div class="result-box"><div class="result-title">Membaca file...</div></div>`;
+
+      try {
+        const rows = await readSpreadsheet(file);
+        const result = validateSpreadsheet(rows);
+        renderImportPreview(result, file.name);
+      } catch (error) {
+        resultBox.innerHTML = `
+          <div class="result-box">
+            <div class="result-title">File belum dapat diproses</div>
+            <p class="result-copy">${escapeHtml(error.message || "Periksa format file dan nama kolom.")}</p>
+          </div>
+        `;
+      }
+    }
+
+    function addShipmentLine() {
+      const container = document.getElementById("shipLines");
+      if (!container) return;
+
+      const row = document.createElement("div");
+      row.className = "ship-line";
+      row.innerHTML = `
+        <select class="ship-product" required>
+          <option value="">Pilih barang</option>
+          ${products.map(product => `
+            <option value="${escapeHtml(product.name)}">${escapeHtml(product.name)} — stok demo ${numberFormat.format(product.stock)}</option>
+          `).join("")}
+        </select>
+        <input class="ship-qty" type="number" min="1" step="1" placeholder="Jumlah" required>
+        <button class="remove-line" type="button" data-action="remove-line" aria-label="Hapus barang">×</button>
+      `;
+      container.appendChild(row);
+    }
+
+    function openShipmentModal() {
+      document.getElementById("modalRoot").innerHTML = `
+        <div class="modal-backdrop" id="modalBackdrop">
+          <section class="modal" role="dialog" aria-modal="true">
+            <div class="modal-head">
+              <div>
+                <p class="eyebrow">PENGIRIMAN BARANG</p>
+                <h2>Buat pengiriman</h2>
+              </div>
+              <button class="modal-close" data-action="close-modal" aria-label="Tutup">×</button>
+            </div>
+
+            <p class="modal-copy">Pilih HUB dan STAGING tujuan, lalu masukkan jumlah barang. Nomor surat jalan akan dibuat otomatis.</p>
+
+            <form id="shipmentForm">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="shipHub">HUB / area</label>
+                  <select class="field-select" id="shipHub" name="hub" required>
+                    <option value="">Pilih HUB</option>
+                    ${hubs.map(hub => `<option value="${hub}">${hub}</option>`).join("")}
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="shipStaging">STAGING / cabang</label>
+                  <input class="field-input" id="shipStaging" name="staging" placeholder="Contoh: LKTU0" required>
+                </div>
+                <div class="field full">
+                  <label for="shipAwb">Nomor resi / AWB (opsional)</label>
+                  <input class="field-input" id="shipAwb" name="awb" placeholder="Boleh dikosongkan">
+                </div>
+              </div>
+
+              <div class="line-heading">
+                <strong>Barang yang dikirim</strong>
+                <button class="btn btn-secondary btn-small" type="button" data-action="add-line">＋ Tambah barang</button>
+              </div>
+              <div class="ship-lines" id="shipLines"></div>
+              <div class="form-error" id="shipmentError"></div>
+
+              <div class="prototype-note">Simulasi ini hanya mengubah angka selama halaman terbuka. Data akan kembali ke contoh awal setelah halaman dimuat ulang.</div>
+
+              <div class="modal-actions">
+                <button class="btn btn-secondary" type="button" data-action="close-modal">Batal</button>
+                <button class="btn btn-primary" type="submit">Konfirmasi & buat surat jalan</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      `;
+
+      addShipmentLine();
+    }
+
+    function renderWaybillModal(shipment) {
+      const lines = shipment.lines.map(line => `
+        <tr>
+          <td>${escapeHtml(line.name)}</td>
+          <td style="text-align:right">${numberFormat.format(line.qty)} unit</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("modalRoot").innerHTML = `
+        <div class="modal-backdrop" id="modalBackdrop">
+          <section class="modal" role="dialog" aria-modal="true">
+            <div class="modal-head">
+              <div>
+                <p class="eyebrow">SURAT JALAN</p>
+                <h2>Pengiriman berhasil dicatat</h2>
+              </div>
+              <button class="modal-close" data-action="close-modal" aria-label="Tutup">×</button>
+            </div>
+
+            <div class="waybill">
+              <div class="waybill-top">
+                <div>
+                  <div class="waybill-label">NOMOR SURAT JALAN</div>
+                  <div class="waybill-no">${escapeHtml(shipment.number)}</div>
+                </div>
+                <span class="status-badge status-info">Dalam perjalanan</span>
+              </div>
+
+              <div class="waybill-meta">
+                <div><div class="meta-label">Tanggal</div><div class="meta-value">${formatDate(shipment.date)}</div></div>
+                <div><div class="meta-label">Resi / AWB</div><div class="meta-value">${escapeHtml(shipment.awb || "—")}</div></div>
+                <div><div class="meta-label">HUB / area</div><div class="meta-value">${escapeHtml(shipment.hub)}</div></div>
+                <div><div class="meta-label">STAGING / cabang</div><div class="meta-value">${escapeHtml(shipment.staging)}</div></div>
+              </div>
+
+              <div class="table-scroll">
+                <table>
+                  <thead><tr><th>Nama barang</th><th style="text-align:right">Jumlah</th></tr></thead>
+                  <tbody>${lines}</tbody>
+                </table>
+              </div>
+
+              <div class="signature-grid">
+                <div class="signature">Disiapkan oleh</div>
+                <div class="signature">Pengirim</div>
+                <div class="signature">Penerima</div>
+              </div>
+            </div>
+
+            <div class="prototype-note">Surat jalan ini adalah pratinjau prototipe. Format final dapat disesuaikan dengan kebutuhan perusahaan.</div>
+            <div class="modal-actions">
+              <button class="btn btn-secondary" data-action="close-modal">Tutup</button>
+              <button class="btn btn-primary" data-action="print-waybill" data-number="${escapeHtml(shipment.number)}">▣ Cetak surat jalan</button>
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function submitShipment(form) {
+      const errorBox = document.getElementById("shipmentError");
+      const hub = form.elements.hub.value.trim();
+      const staging = form.elements.staging.value.trim().toUpperCase();
+      const awb = form.elements.awb.value.trim();
+      const selectedLines = [...form.querySelectorAll(".ship-line")].map(row => ({
+        name: row.querySelector(".ship-product").value,
+        qty: Number(row.querySelector(".ship-qty").value)
+      }));
+
+      const lineMap = new Map();
+      for (const line of selectedLines) {
+        if (!line.name || !Number.isInteger(line.qty) || line.qty < 1) {
+          errorBox.textContent = "Pilih barang dan masukkan jumlah berupa angka bulat lebih dari 0.";
+          return;
+        }
+        lineMap.set(line.name, (lineMap.get(line.name) || 0) + line.qty);
+      }
+
+      for (const [name, qty] of lineMap.entries()) {
+        const product = products.find(item => item.name === name);
+        if (!product || qty > product.stock) {
+          errorBox.textContent = `Stok contoh ${name} tidak mencukupi. Stok tersedia: ${product ? numberFormat.format(product.stock) : 0} unit.`;
+          return;
+        }
+      }
+
+      const lines = [...lineMap.entries()].map(([name, qty]) => ({ name, qty }));
+      lines.forEach(line => {
+        const product = products.find(item => item.name === line.name);
+        product.stock -= line.qty;
+      });
+
+      const shipment = {
+        number: shipmentNo(nextShipmentSequence++),
+        date: new Date().toISOString(),
+        hub,
+        staging,
+        awb,
+        lines,
+        items: lines.length,
+        qty: lines.reduce((sum, line) => sum + line.qty, 0),
+        status: "Dalam perjalanan"
+      };
+
+      shipments.unshift(shipment);
+      createdShipmentCount++;
+      renderPage();
+      renderWaybillModal(shipment);
+    }
+
+    function printWaybill(number) {
+      const shipment = shipments.find(item => item.number === number);
+      if (!shipment) return;
+
+      const rows = shipment.lines.map(line => `
+        <tr><td>${escapeHtml(line.name)}</td><td class="qty">${numberFormat.format(line.qty)} unit</td></tr>
+      `).join("");
+
+      const printWindow = window.open("", "_blank", "width=850,height=700");
+      if (!printWindow) {
+        showToast("Izinkan pop-up browser untuk mencetak surat jalan.");
+        return;
+      }
+
+      printWindow.document.open();
+      printWindow.document.write(`
+        <!doctype html>
+        <html lang="id">
+        <head>
+          <meta charset="utf-8">
+          <title>${escapeHtml(shipment.number)}</title>
+          <style>
+            @page { size: A4; margin: 18mm; }
+            body { color:#202b3c; font-family:Arial,sans-serif; font-size:12px; }
+            h1 { margin:0; font-size:22px; letter-spacing:.08em; }
+            .top { display:flex; justify-content:space-between; padding-bottom:15px; border-bottom:2px solid #26364f; }
+            .company { color:#667085; font-size:11px; }
+            .no { margin-top:7px; font-size:13px; font-weight:bold; }
+            .meta { display:grid; grid-template-columns:1fr 1fr; gap:10px 30px; margin:20px 0; }
+            .label { color:#667085; font-size:10px; }
+            .value { margin-top:4px; font-weight:bold; }
+            table { width:100%; border-collapse:collapse; margin-top:18px; }
+            th,td { padding:10px; border:1px solid #b8c0cc; text-align:left; }
+            th { background:#f2f4f7; }
+            .qty { text-align:right; }
+            .signatures { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:65px; }
+            .sign { padding-top:8px; border-top:1px solid #9aa3af; text-align:center; }
+          </style>
+        </head>
+        <body>
+          <div class="top">
+            <div><div class="company">GUDANG & DISTRIBUSI</div><div class="no">${escapeHtml(shipment.number)}</div></div>
+            <h1>SURAT JALAN</h1>
+          </div>
+          <div class="meta">
+            <div><div class="label">Tanggal</div><div class="value">${formatDate(shipment.date)}</div></div>
+            <div><div class="label">Resi / AWB</div><div class="value">${escapeHtml(shipment.awb || "—")}</div></div>
+            <div><div class="label">HUB / area tujuan</div><div class="value">${escapeHtml(shipment.hub)}</div></div>
+            <div><div class="label">STAGING / cabang tujuan</div><div class="value">${escapeHtml(shipment.staging)}</div></div>
+          </div>
+          <table>
+            <thead><tr><th>Nama barang</th><th class="qty">Jumlah</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <div class="signatures">
+            <div class="sign">Disiapkan oleh</div>
+            <div class="sign">Pengirim</div>
+            <div class="sign">Penerima</div>
+          </div>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+      }, 350);
+    }
+
+    document.addEventListener("click", event => {
+      if (event.target.id === "modalBackdrop") {
+        closeModal();
+        return;
+      }
+
+      const pageButton = event.target.closest("[data-page]");
+      if (pageButton) {
+        setPage(pageButton.dataset.page);
+        return;
+      }
+
+      const actionButton = event.target.closest("[data-action]");
+      if (!actionButton) return;
+
+      const action = actionButton.dataset.action;
+
+      if (action === "import") openImportModal();
+      if (action === "new-shipment") openShipmentModal();
+      if (action === "close-modal") closeModal();
+      if (action === "download-template") downloadTemplate();
+      if (action === "add-line") addShipmentLine();
+      if (action === "print-waybill") printWaybill(actionButton.dataset.number);
+
+      if (action === "remove-line") {
+        const container = document.getElementById("shipLines");
+        const row = actionButton.closest(".ship-line");
+        if (container && row) {
+          if (container.querySelectorAll(".ship-line").length > 1) row.remove();
+          else {
+            row.querySelector(".ship-product").value = "";
+            row.querySelector(".ship-qty").value = "";
+          }
+        }
+      }
+    });
+
+    document.addEventListener("submit", event => {
+      if (event.target.id === "shipmentForm") {
+        event.preventDefault();
+        submitShipment(event.target);
+      }
+    });
+
+    document.addEventListener("input", event => {
+      if (event.target.id === "globalSearch") applyFilters();
+    });
+
+    document.addEventListener("change", event => {
+      if (["stockFilter", "statusFilter", "hubFilter"].includes(event.target.id)) applyFilters();
+      if (event.target.id === "excelFile") handleExcelFile(event.target.files[0]);
+    });
+
+    document.getElementById("menuToggle").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("open");
+      document.getElementById("sidebarBackdrop").classList.toggle("show");
+    });
+
+    document.getElementById("sidebarBackdrop").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.remove("open");
+      document.getElementById("sidebarBackdrop").classList.remove("show");
+    });
+
+    renderPage();
+  </script>
+</body>
+</html>
